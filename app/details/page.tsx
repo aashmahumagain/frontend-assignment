@@ -1,56 +1,50 @@
 "use client";
-import { DetailsRelease, Latestrelease } from "@/api/MusicListApis";
-import { Card, Col, Pagination, Row } from "antd";
+import { Latestrelease } from "@/api/MusicListApis";
+import { Album } from "@/collection";
+import { Card, Col, Modal, Pagination, Row } from "antd";
 import Meta from "antd/es/card/Meta";
 import { ChangeEvent, useEffect, useState } from "react";
-type Album = {
-  artists: Artist[];
-  images: TrackImages;
-  key: string;
-  layout: string;
-  subtitle: string;
-  title: string;
-  share: Share;
-  url: string;
-};
-type Artist = {
-  adamid: string;
-  id: string;
-};
-export interface TrackImages {
-  background: string;
-  coverart: string;
-  coverarthq: string;
-  joecolor: string;
-}
-export interface Share {
-  avatar?: string;
-  href: string;
-  html: string;
-  image: string;
-  snapchat: string;
-  subject: string;
-  text: string;
-  twitter: string;
-}
 export default function Page() {
-  const [datas, setDatas] = useState<Album[] | null>(null);
+  const [datas, setDatas] = useState<Album[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [enteredText, setEnteredText] = useState<string>("");
+  const [selectedAlbum, setSelectedAlbum] = useState<Album | null>(null);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [loading, setLoading] = useState<boolean>(true);
+
   const itemsPerPage = 8;
 
+  const handleClick = (item: Album) => {
+    console.log(item.title);
+    setSelectedAlbum(item);
+    setIsModalVisible(true);
+  };
   useEffect(() => {
+    setLoading(true);
     Latestrelease()
       .then((data) => {
         setDatas(data);
       })
       .catch((error) => {
         console.error(error);
+      })
+      .finally(() => {
+        setLoading(false);
       });
   }, []);
 
   if (datas === null) {
     return null;
+  }
+
+  if (loading) {
+    return (
+      <div>
+        <h2 className="text-center text-3xl text-red-500">
+          Loading please wait...
+        </h2>
+      </div>
+    );
   }
 
   const filteredData = enteredText
@@ -75,6 +69,9 @@ export default function Page() {
     indexOfFirstItem,
     indexOfLastItem
   );
+  const handleModalClose = () => {
+    setIsModalVisible(false);
+  };
 
   return (
     <>
@@ -83,11 +80,15 @@ export default function Page() {
           <label className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">
             Search
           </label>
-          <div className="relative">
+          <div className="relative ">
             <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
               <svg
                 aria-hidden="true"
-                className="w-5 h-5 text-gray-500 dark:text-gray-400"
+                className="w-5 h-5 text-white-500 
+                
+                
+                
+                text-white-400"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -102,9 +103,10 @@ export default function Page() {
               </svg>
             </div>
             <input
+              style={{ width: "25%" }}
               type="search"
               id="default-search"
-              className="block w-full p-4 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              className="m-2 block w-full p-4 pl-10 text-sm text-white-900 border  rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:placeholder-gray-400"
               placeholder="Search Here..."
               required
               onChange={handleSearch}
@@ -115,23 +117,42 @@ export default function Page() {
 
       <Row>
         {currentItems.map((item) => (
-          <Col key={item.key} span={6}>
+          <Col key={item.key} xs={24} sm={12} md={6}>
             <Card
               hoverable
-              style={{ width: 240, margin: 20 }}
-              cover={<img alt="example" src={item.images.coverart} />}
+              style={{ margin: 20 }}
+              onClick={() => handleClick(item)}
+              cover={<img alt="example" src={item.images.background} />}
             >
               <Meta title={item.title} description={item.share.text} />
             </Card>
           </Col>
         ))}
       </Row>
+
+      <Modal
+        title={selectedAlbum?.title}
+        visible={isModalVisible}
+        onCancel={handleModalClose}
+        footer={null}
+        centered
+      >
+        {selectedAlbum && (
+          <div>
+            <img src={selectedAlbum.images.background} />
+            <h3 className="text-2xl">Name:{selectedAlbum.share.text}</h3>
+            <p className="text-red">
+              Release Date and tracklist is not available in this api
+            </p>
+          </div>
+        )}
+      </Modal>
       <Pagination
         current={currentPage}
         pageSize={itemsPerPage}
-        total={filteredData.length}
+        total={filteredData?.length}
         onChange={handlePageChange}
-        style={{ marginTop: 20, textAlign: "center" }}
+        style={{ margin: 20, textAlign: "center" }}
       />
     </>
   );

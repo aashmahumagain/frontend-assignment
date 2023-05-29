@@ -12,8 +12,8 @@ export default function Homepage() {
           <div className="underline decoration-sky-500/30 text-3xl text-center my-1 font-bold">
             The pleasure of Music
           </div>
-          <div className="text-2xl text-center scroll-pl-6 leading-8 ">
-            <p className="sm:text-4 text-[#646663] p-2.5">
+          <div className="text-center  ">
+            <p className="sm:text-lg md:text-xl lg:text-2xl xl:text-3xl text-[#646663] p-2.5">
               Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus
               elementum turpis lorem, et volutpat mauris tempor pellentesque.
               Vivamus in sem tortor. Quisque sed nulla sed dui consequat
@@ -21,7 +21,8 @@ export default function Homepage() {
               ornare est eu viverra. Nunc iaculis placerat eleifend.
             </p>
           </div>
-          <div className="m-6 ">
+
+          <div className="m-6 flex items-center">
             <Link href="/album">
               <button
                 type="button"

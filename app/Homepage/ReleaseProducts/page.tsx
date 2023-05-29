@@ -57,13 +57,13 @@ export default function ReleaseProducts() {
   const firstTenAlbums = filteredAlbums.slice(0, 8);
   return (
     <>
-      <Row gutter={6}>
+      <Row gutter={12}>
         {firstTenAlbums?.map((item) => (
           <Col key={item.key} xs={24} sm={12} md={6}>
             <Card
               onClick={() => handleClick(item)}
               hoverable
-              style={{ marginBottom: 20 }}
+              style={{ margin: 20 }}
               cover={<img alt="example" src={item.images.background} />}
             >
               <Meta title={item.title} description={item.share.text} />

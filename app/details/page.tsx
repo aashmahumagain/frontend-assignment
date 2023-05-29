@@ -115,7 +115,7 @@ export default function Page() {
         </form>
       </div>
 
-      <Row>
+      <Row gutter={12}>
         {currentItems.map((item) => (
           <Col key={item.key} xs={24} sm={12} md={6}>
             <Card

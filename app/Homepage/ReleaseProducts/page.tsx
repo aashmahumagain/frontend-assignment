@@ -1,8 +1,7 @@
 import { Latestrelease } from "@/api/MusicListApis";
 import { Album } from "@/collection";
 import { Card, Col, Image, Modal, Row } from "antd";
-import React, { useEffect, useState } from "react";
-import loadingimg from "../../../public/images/loadinimg.png";
+import React, { useEffect, useState, useRef } from "react";
 const { Meta } = Card;
 
 export default function ReleaseProducts() {
@@ -10,7 +9,8 @@ export default function ReleaseProducts() {
   const [albumselect, setAlbumSelect] = useState<string>("");
   const [selectedAlbum, setSelectedAlbum] = useState<Album | null>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [loading, setLoading] = useState<boolean>(true); // Set initial loading state to true
+  const [loading, setLoading] = useState<boolean>(true);
+  const isDataLoaded = useRef(false);
 
   const handleClick = (item: Album) => {
     console.log(item.title);
@@ -23,18 +23,21 @@ export default function ReleaseProducts() {
   };
 
   useEffect(() => {
-    setLoading(true);
-    Latestrelease()
-      .then((data) => {
-        setDatas(data);
-        console.log(data);
-      })
-      .catch((error) => {
-        console.error(error);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+    if (!isDataLoaded.current) {
+      setLoading(true);
+      Latestrelease()
+        .then((data) => {
+          setDatas(data);
+          console.log(data);
+          isDataLoaded.current = true;
+        })
+        .catch((error) => {
+          console.error(error);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    }
   }, []);
 
   if (loading) {
@@ -55,6 +58,7 @@ export default function ReleaseProducts() {
     ? datas.filter((item) => item.title === albumselect)
     : datas;
   const firstTenAlbums = filteredAlbums.slice(0, 8);
+
   return (
     <>
       <Row gutter={12}>

@@ -3,7 +3,7 @@ import { Latestrelease } from "@/api/MusicListApis";
 import { Album } from "@/collection";
 import { Card, Col, Modal, Pagination, Row } from "antd";
 import Meta from "antd/es/card/Meta";
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 export default function Page() {
   const [datas, setDatas] = useState<Album[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -11,7 +11,7 @@ export default function Page() {
   const [selectedAlbum, setSelectedAlbum] = useState<Album | null>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [loading, setLoading] = useState<boolean>(true);
-
+  const isDataLoaded = useRef(false);
   const itemsPerPage = 8;
 
   const handleClick = (item: Album) => {
@@ -19,18 +19,35 @@ export default function Page() {
     setSelectedAlbum(item);
     setIsModalVisible(true);
   };
+  // useEffect(() => {
+  //   setLoading(true);
+  //   Latestrelease()
+  //     .then((data) => {
+  //       setDatas(data);
+  //     })
+  //     .catch((error) => {
+  //       console.error(error);
+  //     })
+  //     .finally(() => {
+  //       setLoading(false);
+  //     });
+  // }, []);
   useEffect(() => {
-    setLoading(true);
-    Latestrelease()
-      .then((data) => {
-        setDatas(data);
-      })
-      .catch((error) => {
-        console.error(error);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+    if (!isDataLoaded.current) {
+      setLoading(true);
+      Latestrelease()
+        .then((data) => {
+          setDatas(data);
+          console.log(data);
+          isDataLoaded.current = true;
+        })
+        .catch((error) => {
+          console.error(error);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    }
   }, []);
 
   if (datas === null) {

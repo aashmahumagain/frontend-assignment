@@ -28,3 +28,8 @@ export interface Share {
   text: string;
   twitter: string;
 }
+export interface MusicListType {
+  layout: string;
+  subtitle: string;
+  title: string;
+}

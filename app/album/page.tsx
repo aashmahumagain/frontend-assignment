@@ -1,7 +1,7 @@
 "use client";
 import { Latestrelease } from "@/api/MusicListApis";
 import { Card, Col, Row } from "antd";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/router";
 import { Album } from "@/collection";
 const { Meta } = Card;
@@ -19,20 +19,23 @@ export default function Page(props: PageProps) {
 
   const [datas, setDatas] = useState<Album[] | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  //   setDatas(albums);
+  const isDataLoaded = useRef(false);
   useEffect(() => {
-    setLoading(true);
-    Latestrelease()
-      .then((data) => {
-        setDatas(data);
-        console.log(data);
-      })
-      .catch((error) => {
-        console.error(error);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+    if (!isDataLoaded.current) {
+      setLoading(true);
+      Latestrelease()
+        .then((data) => {
+          setDatas(data);
+          console.log(data);
+          isDataLoaded.current = true;
+        })
+        .catch((error) => {
+          console.error(error);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    }
   }, []);
   if (loading) {
     return (
